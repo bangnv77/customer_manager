@@ -24,3 +24,33 @@ $(document).ready(function(){
     console.log('Error: Could Not Open Database...');
   };
 });
+
+// Add Customer
+function addCustomer(){
+  var name = $('#name').val();
+  var email = $('#email').val();
+
+  var transaction = db.transaction(["customers"], "readwrite");
+  // Ask for ObjectStore
+  var store = transaction.objectStore("customers");
+
+  // Define Customer
+  var customer = {
+    name: name,
+    email: email
+  }
+
+  // Perform the Add
+  var request = store.add(customer);
+
+  // Success
+  request.onsuccess = function(e){
+    window.location.href = "index.html";
+  };
+
+  // Error
+  request.onerror = function(e){
+    alert("Sorry, the customer was not added");
+    console.log('Error', e.target.error.name);
+  };
+};
