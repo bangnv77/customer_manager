@@ -1,6 +1,6 @@
 $(document).ready(function(){
   // Open database - https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
-  var db;
+  // var db;
   var request = indexedDB.open('customermanager', 1);
 
   request.onupgradeneeded = function(e){
@@ -8,6 +8,8 @@ $(document).ready(function(){
 
     if(!db.objectStoreNames.contains('customers')){
       var os = db.createObjectStore('customers', { keyPath: "id", autoIncrement: true });
+      // Create Index for Name
+      os.createIndex('name', 'name', {unique: false});
     }
   };
 
@@ -16,7 +18,7 @@ $(document).ready(function(){
     console.log('Success: Opened Database...');
     db = e.target.result;
     // Show Customers
-    // showCustomers();
+    showCustomers();
   };
 
   // Error
@@ -52,5 +54,28 @@ function addCustomer(){
   request.onerror = function(e){
     alert("Sorry, the customer was not added");
     console.log('Error', e.target.error.name);
+  };
+};
+
+// Display customers
+function showCustomers(e){
+  var transaction = db.transaction(["customers"], "readonly");
+  // Ask for ObjectStore
+  var store = transaction.objectStore("customers");
+  var index = store.index('name');
+
+  var output = '';
+  index.openCursor().onsuccess = function(e){
+    var cursor = e.target.result;
+    if(cursor){
+      output += "<tr>";
+      output += "<td>" + cursor.value.id + "</td>";
+      output += "<td><span>" + cursor.value.name + "</span></td>";
+      output += "<td><span>" + cursor.value.email + "</span><td>";
+      output += "<td><a href=''>Delete</a></td>";
+      output += "</tr>";
+      cursor.continue();
+    }
+    $('#customers').html(output);
   };
 };
