@@ -72,10 +72,37 @@ function showCustomers(e){
       output += "<td>" + cursor.value.id + "</td>";
       output += "<td><span class='cursor customer'>" + cursor.value.name + "</span></td>";
       output += "<td><span class='cursor customer'>" + cursor.value.email + "</span><td>";
-      output += "<td><a href=''>Delete</a></td>";
+      output += "<td><a onclick='removeCustomer(" + cursor.value.id + ")' href=''>Delete</a></td>";
       output += "</tr>";
       cursor.continue();
     }
     $('#customers').html(output);
   };
+};
+
+// Delete A Customer
+function removeCustomer(id){
+  var transaction = db.transaction(["customers"], "readwrite");
+  // Ask for ObjectStore
+  var store = transaction.objectStore("customers");
+
+  var request = store.delete(id);
+
+  // Success
+  request.onsuccess = function(){
+    console.log('customer ' + id + ' Deleted');
+    $('customers_' + id).remove();
+  };
+
+  // Error
+  request.onerror = function(){
+    alert("Sorry, the customer was not removed");
+    console.log('Error', e.target.error.name);
+  }
+};
+
+// Clear All Customers
+function clearCustomers(){
+  indexedDB.deleteDatabase('customermanager');
+  window.location.href="index.html";
 };
