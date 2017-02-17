@@ -107,3 +107,11 @@ body {
 .danger {
   color: red;
 }
+
+.cursor {
+  cursor: pointer;
+}
+
+span.customer {
+  padding: 8px 20px;
+}
